@@ -27,7 +27,7 @@ BEGIN {
 CHECK {
     my ($stdout, $stderr);
     {
-	    local $O::savebackslash = $\;
+        local $O::savebackslash = $\;
         local $\ = undef;
         capture \&{ B::Deparse::compile('-si0') }, \$stdout, \$stderr;
     }
