@@ -1,7 +1,5 @@
-Build.PL
 Changes
 MANIFEST
-Makefile.PL
 README
 lib/Acme/OneLiner.pm
 t/perlcritic.t

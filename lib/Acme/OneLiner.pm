@@ -4,13 +4,7 @@ use warnings;
 use strict;
 use Carp;
 
-use version; our $VERSION = qv('0.0.3');
-
-# Other recommended modules (uncomment to use):
-#  use IO::Prompt;
-#  use Perl6::Export;
-#  use Perl6::Slurp;
-#  use Perl6::Say;
+use version; our $VERSION = qv('0.0.2');
 
 use B qw/minus_c save_BEGINs/;
 use B::Deparse;
@@ -33,16 +27,29 @@ CHECK {
     }
 
     my @lines = split /\n/, $stdout;
+    my $option = '';
+
+  LINE:
     for my $line (@lines) {
+        if ($line =~ / \A use \s ([\w:]+) (.*) ; \z /xms) {
+            my ($module, $args) = ($1, $2);
+            $option .= "-M$module";
+            if (my @args = $args =~ / ' (.*?) ' /xmsg) {
+                $option .= '=' . join ',', @args;
+            }
+            $option .= ' ';
+            $line = undef; next LINE;
+        }
         $line =~ s{ ' ( .*? ) ' }
                   { (my $str = $1) =~ s|/|\\/|g; "q/$str/" }egxms;
         $line =~ s{ ' }
                   {'\\''}gxms;
     }
+    @lines = grep defined, @lines;
 
     {
         local $\ = undef;
-        print qq[perl -e '@lines'\n];
+        print qq[$^X $option-e '@lines'\n];
     }
 
     close STDERR;
@@ -58,7 +65,7 @@ Acme::OneLiner - [One line description of module's purpose here]
 
 =head1 VERSION
 
-This document describes Acme::OneLiner version 0.0.1
+This document describes Acme::OneLiner version 0.0.2
 
 
 =head1 SYNOPSIS

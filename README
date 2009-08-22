@@ -1,4 +1,4 @@
-Acme-OneLiner version 0.0.1
+Acme-OneLiner version 0.0.2
 
 [ REPLACE THIS...
 
@@ -19,14 +19,14 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-	perl Makefile.PL
+	perl -MExtUtils::MakeMaker -Mwarnings -Mstrict=refs -e 'WriteMakefile(q/NAME/, q/Acme::OneLiner/, q/AUTHOR/, q/Yoshihiro Sugi <sugi1982@gmail.com>/, q/VERSION_FROM/, q/lib\/Acme\/OneLiner.pm/, q/ABSTRACT_FROM/, q/lib\/Acme\/OneLiner.pm/, q/PL_FILES/, {}, q/PREREQ_PM/, {q/Test::More/, 0, q/version/, 0, q/IO::CaptureOutput/, 0}, q/dist/, {q/COMPRESS/, q/gzip -9f/, q/SUFFIX/, q/gz/}, q/clean/, {q/FILES/, q/Acme-OneLiner-*/});'
 	make
 	make test
 	make install
 
 Alternatively, to install with Module::Build, you can use the following commands:
 
-	perl Build.PL
+    perl -MModule::Build -Mwarnings -Mstrict=refs -e 'my $builder = q/Module::Build/->new(q/module_name/, q/Acme::OneLiner/, q/license/, q/perl/, q/dist_author/, q/Yoshihiro Sugi <sugi1982@gmail.com>/, q/dist_version_from/, q/lib\/Acme\/OneLiner.pm/, q/requires/, {q/Test::More/, 0, q/version/, 0, q/IO::CaptureOutput/, 0}, q/add_to_cleanup/, [q/Acme-OneLiner-*/]); $builder->create_build_script;'
 	./Build
 	./Build test
 	./Build install
