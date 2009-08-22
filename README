@@ -26,7 +26,7 @@ To install this module, run the following commands:
 
 Alternatively, to install with Module::Build, you can use the following commands:
 
-    perl -MModule::Build -Mwarnings -Mstrict=refs -e 'my $builder = q/Module::Build/->new(q/module_name/, q/Acme::OneLiner/, q/license/, q/perl/, q/dist_author/, q/Yoshihiro Sugi <sugi1982@gmail.com>/, q/dist_version_from/, q/lib\/Acme\/OneLiner.pm/, q/requires/, {q/Test::More/, 0, q/version/, 0, q/IO::CaptureOutput/, 0}, q/add_to_cleanup/, [q/Acme-OneLiner-*/]); $builder->create_build_script;'
+	perl -MModule::Build -Mwarnings -Mstrict=refs -e 'my $builder = q/Module::Build/->new(q/module_name/, q/Acme::OneLiner/, q/license/, q/perl/, q/dist_author/, q/Yoshihiro Sugi <sugi1982@gmail.com>/, q/dist_version_from/, q/lib\/Acme\/OneLiner.pm/, q/requires/, {q/Test::More/, 0, q/version/, 0, q/IO::CaptureOutput/, 0}, q/add_to_cleanup/, [q/Acme-OneLiner-*/]); $builder->create_build_script;'
 	./Build
 	./Build test
 	./Build install
