@@ -40,8 +40,6 @@ CHECK {
             $option .= ' ';
             $line = undef; next LINE;
         }
-        $line =~ s{ ' ( .*? ) ' }
-                  { (my $str = $1) =~ s|/|\\/|g; "q/$str/" }egxms;
         $line =~ s{ ' }
                   {'\\''}gxms;
     }
