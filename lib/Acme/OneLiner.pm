@@ -27,27 +27,35 @@ CHECK {
     }
 
     my @lines = split /\n/, $stdout;
-    my $option = '';
+    my %options = ();
 
   LINE:
     for my $line (@lines) {
         if ($line =~ / \A use \s ([\w:]+) (.*) ; \z /xms) {
             my ($module, $args) = ($1, $2);
-            $option .= "-M$module";
+            $options{$module} ||= {};
             if (my @args = $args =~ / ' (.*?) ' /xmsg) {
-                $option .= '=' . join ',', @args;
+                @{$options{$module}}{@args}++;
             }
-            $option .= ' ';
             $line = undef; next LINE;
         }
         $line =~ s{ ' }
                   {'\\''}gxms;
     }
     @lines = grep defined, @lines;
+    my $option = '';
+    for my $module (keys %options) {
+        my $str  = " -M$module";
+        my @args = keys %{$options{$module}};
+        if (@args) {
+            $str .= '=' . join ',', @args;
+        }
+        $option .= $str;
+    }
 
     {
         local $\ = undef;
-        print qq[$^X $option-e '@lines'\n];
+        print qq[$^X$option -e '@lines'\n];
     }
 
     close STDERR;
