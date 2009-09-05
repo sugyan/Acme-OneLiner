@@ -49,7 +49,6 @@ CHECK {
             $line = undef; next LINE;
         }
     }
-    @lines = grep defined, @lines;
     my $output_option = '';
     for my $module (keys %modules) {
         my $str = " -M$module";
@@ -62,6 +61,7 @@ CHECK {
 
     {
         local $\ = undef;
+        @lines = grep defined, @lines;
         my $str = join $shorten ? '' : ' ', @lines;
         if ($symbolize) {
             $str = _symbolize($str);
