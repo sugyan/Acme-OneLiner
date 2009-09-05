@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp;
 
-use version; our $VERSION = qv('0.0.2');
+use version; our $VERSION = qv('0.0.3');
 
 use B qw/minus_c save_BEGINs/;
 use B::Deparse;
@@ -119,7 +119,7 @@ Acme::OneLiner - [One line description of module's purpose here]
 
 =head1 VERSION
 
-This document describes Acme::OneLiner version 0.0.2
+This document describes Acme::OneLiner version 0.0.3
 
 
 =head1 SYNOPSIS
