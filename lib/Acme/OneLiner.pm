@@ -10,8 +10,14 @@ use B qw/minus_c save_BEGINs/;
 use B::Deparse;
 use IO::CaptureOutput qw/capture/;
 
-
 # Module implementation here
+
+my %options;
+
+sub import {
+    my $self = shift;
+    $options{$_}++ for @_;
+}
 
 BEGIN {
     minus_c;
@@ -26,31 +32,81 @@ CHECK {
         capture \&{ B::Deparse::compile('-si0') }, \$stdout, \$stderr;
     }
 
+    my $shorten   = $options{short};
+    my $symbolize = $options{symbol};
+
     my @lines = split /\n/, $stdout;
-    my $option = '';
+    my %modules = ();
 
   LINE:
     for my $line (@lines) {
-        if ($line =~ / \A use \s ([\w:]+) (.*) ; \z /xms) {
+        if ($shorten && $line =~ / \A use \s ([\w:]+) (.*) ; \z /xms) {
             my ($module, $args) = ($1, $2);
-            $option .= "-M$module";
+            $modules{$module} ||= {};
             if (my @args = $args =~ / ' (.*?) ' /xmsg) {
-                $option .= '=' . join ',', @args;
+                $modules{$module}->{$_}++ for @args;
             }
-            $option .= ' ';
             $line = undef; next LINE;
         }
-        $line =~ s{ ' }
-                  {'\\''}gxms;
     }
     @lines = grep defined, @lines;
+    my $output_option = '';
+    for my $module (keys %modules) {
+        my $str = " -M$module";
+        my @args = keys %{$modules{$module}};
+        if (@args) {
+            $str .= '=' . join ',', @args;
+        }
+        $output_option .= $str;
+    }
 
     {
         local $\ = undef;
-        print qq[$^X $option-e '@lines'\n];
+        my $str = join $shorten ? '' : ' ', @lines;
+        if ($symbolize) {
+            $str = _symbolize($str);
+        } else {
+            $str =~ s{ ' }
+                     {'\\''}gxms;
+        }
+        print qq[$^X$output_option -e '$str'\n];
     }
 
     close STDERR;
+}
+
+sub _symbolize {
+    my $str = shift;
+
+    my $dict = do {
+        my $dict = {};
+        my @chars = grep {
+            / [^\da-zA-Z\'\"\$\@\\] /xms
+        } map { chr } (0x21 .. 0x7E);
+
+        for my $first (@chars) {
+            for my $second (@chars) {
+                for my $third (@chars) {
+                    my $xor = ($first ^ $second ^ $third);
+                    push @{$dict->{$xor}}, [$first, $second, $third];
+                }
+            }
+        }
+
+        $dict;
+    };
+
+    my ($first, $second, $third);
+    for my $i (0..length($str) - 1) {
+        my @sets = @{$dict->{substr($str, $i, 1)}};
+        my $set = $sets[rand @sets];
+        $first  .= $set->[0];
+        $second .= $set->[1];
+        $third  .= $set->[2];
+    }
+    my $output = qq/("$first"^"$second"^"$third")/;
+
+    return qq/""!~("(?{".$output."})")/;
 }
 
 1; # Magic true value required at end of module
