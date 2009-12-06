@@ -13,6 +13,7 @@ use IO::CaptureOutput qw/capture/;
 # Module implementation here
 
 my %options;
+my $win32 = $^O eq 'MSWin32';
 
 sub import {
     my $self = shift;
@@ -66,10 +67,15 @@ CHECK {
         if ($symbolize) {
             $str = _symbolize($str);
         } else {
-            $str =~ s{ ' }
-                     {'\\''}gxms;
+            if ($win32) {
+                $str =~ s{ " }
+                         {\\"}gxms;
+            } else {
+                $str =~ s{ ' }
+                         {'\\''}gxms;
+            }
         }
-        print qq[$^X$output_option -e '$str'\n];
+        printf qq[$^X$output_option -e %s\n], $win32 ? qq["$str"] : qq['$str'];
     }
 
     close STDERR;
@@ -106,7 +112,10 @@ sub _symbolize {
     }
     my $output = qq/("$first"^"$second"^"$third")/;
 
-    return qq/""!~("(?{".$output."})")/;
+    my $code = qq/""!~("(?{".$output."})")/;
+    $code =~ s/"/'/gm if $win32;
+    
+    return $code;
 }
 
 1; # Magic true value required at end of module
